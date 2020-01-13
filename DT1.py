@@ -2,7 +2,7 @@ import sklearn
 import numpy as np
 import csv
 import binarytree
-
+import pandas as pd
 class DataEntry:
     def __init__(
         self,
@@ -48,7 +48,7 @@ def InformationGain(data_set,feature):
         children_enthropy+=Enthropy(child_data_set)*(len(child_data_set)/data_set_size)
     return enthropy-children_enthropy
 
-def ID3_SelectFeature(features: list ,data_set):
+def ID3_SelectFeature(features: list ,data_set,x:int):
     max_information_gain=0
     max_feature=DataEntry.Pregnancies
     for feature in features:
@@ -58,6 +58,16 @@ def ID3_SelectFeature(features: list ,data_set):
             max_information_gain=information_gain
     return max_feature
 """ TODO load data into features and data set"""
+
+
+if __name__ == '__main__':
+    columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
+             'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']
+    features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
+                'BMI', 'DiabetesPedigreeFunction', 'Age']
+    train_data = pd.read_csv("train.csv", header=None, names=columns, skiprows=1)
+    X_train = train_data[features]
+    y_train = train_data.Outcome
 
 
 
