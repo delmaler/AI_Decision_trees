@@ -1,33 +1,12 @@
 import sklearn
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
 import numpy as np
 import csv
 import binarytree
 import pandas as pd
-class DataEntry:
-    def __init__(
-        self,
-        Pregnancies: int,
-        Glucose:int,
-        BloodPressure:int,
-        SkinThickness:int,
-        Insulin:int,
-        BMI:float,
-        DiabetesPedigreeFunction:float,
-        Age:int,
-        Outcome:bool
 
-
-    ):
-        self.Pregnancies =Pregnancies
-        self.Glucose = (Glucose)
-        self.BloodPressure = BloodPressure
-        self.SkinThickness = SkinThickness
-        self.Insulin = Insulin
-        self.BMI = BMI
-        self.DiabetesPedigreeFunction = DiabetesPedigreeFunction
-        self.Age= Age
-        self.Outcome =Outcome
-        
+"""       
 def Enthropy(data_set):
     enthropy=0
     EC=[0,0]
@@ -57,17 +36,33 @@ def ID3_SelectFeature(features: list ,data_set,x:int):
             max_feature=feature
             max_information_gain=information_gain
     return max_feature
+    """
 """ TODO load data into features and data set"""
 
-
-if __name__ == '__main__':
-    columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
-             'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']
-    features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
-                'BMI', 'DiabetesPedigreeFunction', 'Age']
-    train_data = pd.read_csv("train.csv", header=None, names=columns, skiprows=1)
-    X_train = train_data[features]
-    y_train = train_data.Outcome
-
-
+criteria = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
+           'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']
+features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
+            'BMI', 'DiabetesPedigreeFunction', 'Age']
+train_data = pd.read_csv("train.csv", sep="," , names=criteria, skiprows=1)
+print(train_data.head())
+decision_tree = DecisionTreeClassifier(
+    "entropy").fit(train_data[features], train_data.Outcome)
+data = pd.read_csv("test.csv", sep=",",header=None, names=criteria, skiprows=1)
+classificator = decision_tree.predict(data[features])
+confusion_mat = metrics.confusion_matrix(data.Outcome, classificator)
+print(confusion_mat)
+TN, TP, FN, FP = confusion_mat.ravel()
+print("[[{} {}]".format(TP, FP))
+print("[{} {}]]".format(FN, TN))
+pruning_values = [3,9,27]
+accuracy_values = []
+for x in pruning_values:
+    acc=0
+    for i in range(100):
+        dt = DecisionTreeClassifier(criterion="entropy", min_samples_split=x)
+        dt = dt.fit(train_data[features], train_data.Outcome)
+        prediction = dt.predict(data[features])
+        acc += metrics.accuracy_score(data.Outcome,prediction)
+    accuracy_values.append(acc/100)
+print(accuracy_values)
 
