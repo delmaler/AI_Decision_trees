@@ -1,68 +1,77 @@
-import sklearn
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 import numpy as np
-import csv
 import binarytree
 import pandas as pd
 
+
 """       
-def Enthropy(data_set):
+def Enthropy(test_df_set):
     enthropy=0
     EC=[0,0]
-    for data_entry in data_set:
-        EC[data_entry.outcome]+=1
-    PC=[EC[0]/len(data_set),EC[1]/len(data_set)]
+    for test_df_entry in test_df_set:
+        EC[test_df_entry.outcome]+=1
+    PC=[EC[0]/len(test_df_set),EC[1]/len(test_df_set)]
     for i in range(2):
         if PC[i]>0:
             enthropy-=PC[i]*np.log2(PC[i])
     return enthropy
 
-def InformationGain(data_set,feature):
-    enthropy=Enthropy(data_set)
+def InformationGain(test_df_set,feature):
+    enthropy=Enthropy(test_df_set)
     children_enthropy=0
-    data_set_size=len(data_set)
+    test_df_set_size=len(test_df_set)
     for value in feature:
-        child_data_set=filter(lambda x: x.feature==value , data_set) #TODO need to support continious features
-        children_enthropy+=Enthropy(child_data_set)*(len(child_data_set)/data_set_size)
+        child_test_df_set=filter(lambda x: x.feature==value , test_df_set) #TODO need to support continious features
+        children_enthropy+=Enthropy(child_test_df_set)*(len(child_test_df_set)/test_df_set_size)
     return enthropy-children_enthropy
 
-def ID3_SelectFeature(features: list ,data_set,x:int):
+def ID3_SelectFeature(features: list ,test_df_set,x:int):
     max_information_gain=0
-    max_feature=DataEntry.Pregnancies
+    max_feature=test_dfEntry.Pregnancies
     for feature in features:
-        information_gain=InformationGain(data_set,feature)
-        if InformationGain(data_set,feature)>max_information_gain:
+        information_gain=InformationGain(test_df_set,feature)
+        if InformationGain(test_df_set,feature)>max_information_gain:
             max_feature=feature
             max_information_gain=information_gain
     return max_feature
     """
-""" TODO load data into features and data set"""
 
-criteria = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
-           'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']
-features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin',
-            'BMI', 'DiabetesPedigreeFunction', 'Age']
-train_data = pd.read_csv("train.csv", sep="," , names=criteria, skiprows=1)
-print(train_data.head())
+
+def print_confusion_mat(outcome, prediction):
+    confusion_mat = metrics.confusion_matrix(outcome, prediction)
+    TN, TP, FN, FP = confusion_mat.ravel()
+    print("[[{} {}]".format(TP, FP))
+    print("[{} {}]]".format(FN, TN))
+    #error_w=4*FN+FP
+    #print("the error is %d",error_w)
+
+train_df = pd.read_csv("train.csv", sep=",")
+cols = list(train_df.columns.values)
+features = cols[:-1]
 decision_tree = DecisionTreeClassifier(
-    "entropy").fit(train_data[features], train_data.Outcome)
-data = pd.read_csv("test.csv", sep=",",header=None, names=criteria, skiprows=1)
-classificator = decision_tree.predict(data[features])
-confusion_mat = metrics.confusion_matrix(data.Outcome, classificator)
-print(confusion_mat)
-TN, TP, FN, FP = confusion_mat.ravel()
-print("[[{} {}]".format(TP, FP))
-print("[{} {}]]".format(FN, TN))
-pruning_values = [3,9,27]
+    "entropy").fit(train_df[features], train_df.Outcome)
+test_df = pd.read_csv("test.csv", sep=",")
+prediction = decision_tree.predict(test_df[features])
+print_confusion_mat(test_df.Outcome, prediction)
+print(metrics.accuracy_score(test_df.Outcome,prediction))
+dt = DecisionTreeClassifier(criterion="entropy", min_samples_split=27)
+dt = dt.fit(train_df[features], train_df.Outcome)
+prediction = dt.predict(test_df[features])
+print_confusion_mat(test_df.Outcome,prediction)
+
+#code for making graph
+"""
+pruning_values = range(2,27)
 accuracy_values = []
 for x in pruning_values:
     acc=0
-    for i in range(100):
+    for i in range(20):
         dt = DecisionTreeClassifier(criterion="entropy", min_samples_split=x)
-        dt = dt.fit(train_data[features], train_data.Outcome)
-        prediction = dt.predict(data[features])
-        acc += metrics.accuracy_score(data.Outcome,prediction)
-    accuracy_values.append(acc/100)
+        dt = dt.fit(train_df[features], train_df.Outcome)
+        prediction = dt.predict(test_df[features])
+        acc += metrics.accuracy_score(test_df.Outcome,prediction)
+    accuracy_values.append(acc/20)
 print(accuracy_values)
-
+print(max(accuracy_values),accuracy_values.index(max(accuracy_values)))
+"""
