@@ -24,7 +24,7 @@ def get_distance(sample_a, sample_b):
     return np.sqrt(sum)
 
 
-def get_decision(data_set, outcomes, sample):
+def get_decision(data_set, outcomes, sample, KNN):
     distances = []
     index = 0
     desicion = 0
@@ -33,13 +33,12 @@ def get_decision(data_set, outcomes, sample):
         index += 1
     new_sorted = sorted(distances, key=lambda tup: tup[0])
     index = 0
-    while index < 9:
+    while index < KNN:
         temp = outcomes[new_sorted[index][1]]
-        val = 1 if temp == 1 else -1
+        val = 4 if temp == 1 else -1
         desicion += val
         index += 1
     return 1 if desicion > 0 else 0
-
 
 
 if __name__ == '__main__':
@@ -76,8 +75,10 @@ if __name__ == '__main__':
         i += 1
 
     #setting results
-    results = []
-    for row in np_test_data:
-        results.append(get_decision(np_train_data, np_train_result, row))
-    print (confusion_matrix( np_test_result,results))
+    rounds = [1, 3, 9, 27]
+    for round in rounds:
+        results = []
+        for row in np_test_data:
+            results.append(get_decision(np_train_data, np_train_result, row, round))
+        print(confusion_matrix(np_test_result,results))
 
