@@ -14,7 +14,6 @@ def diff(first, second):
 
 
 def convert_words_to_index(partial, full):
-    print(full)
     res = []
     for l in partial:
         res.append(full.index(l))
@@ -95,7 +94,6 @@ def get_best_feature_group(samples_train, results_train, samples_test, results_t
         while d < len(remaining):
             feature = remaining[d]
             chosen.append(feature)
-            print(chosen)
             temp_samples_train = samples_train[chosen]
             temp_samples_test = samples_test[chosen]
             np_samples_train = np.array(temp_samples_train)
@@ -109,7 +107,6 @@ def get_best_feature_group(samples_train, results_train, samples_test, results_t
                 to_remove = feature
                 flag = True
             d += 1
-            print("d is:" + str(d))
             chosen.pop()
         if flag:
             result.append(to_remove)
@@ -131,6 +128,5 @@ if __name__ == '__main__':
     samples_test = test_data[features]
     results_test = test_data.Outcome
     res_in_words = get_best_feature_group(samples_train, results_train, samples_test, results_test, temp_feature)
-    print(res_in_words)
     print(convert_words_to_index(res_in_words, features))
     #setting results
