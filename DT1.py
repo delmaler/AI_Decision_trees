@@ -1,8 +1,10 @@
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 import numpy as np
-import binarytree
+#from sklearn.tree import export_graphviz
 import pandas as pd
+#import matplotlib.pyplot as plt
+# from graphviz import render
 
 
 """       
@@ -54,11 +56,14 @@ decision_tree = DecisionTreeClassifier(
 test_df = pd.read_csv("test.csv", sep=",")
 prediction = decision_tree.predict(test_df[features])
 print_confusion_mat(test_df.Outcome, prediction)
-print(metrics.accuracy_score(test_df.Outcome,prediction))
-dt = DecisionTreeClassifier(criterion="entropy", min_samples_split=27)
-dt = dt.fit(train_df[features], train_df.Outcome)
-prediction = dt.predict(test_df[features])
-print_confusion_mat(test_df.Outcome,prediction)
+
+
+"""
+dt = DecisionTreeClassifier(criterion="entropy", min_samples_split=27).fit(train_df[features],train_df['Outcome'])
+export_graphviz(dt, out_file='tree.dot', filled=True, rounded=True, special_characters=True,
+                feature_names=features, class_names=['0', '1'])
+render('dot', 'png', 'tree.dot')
+"""
 
 #code for making graph
 """
@@ -75,3 +80,5 @@ for x in pruning_values:
 print(accuracy_values)
 print(max(accuracy_values),accuracy_values.index(max(accuracy_values)))
 """
+
+
